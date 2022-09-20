@@ -19,20 +19,34 @@
         <activity
             android:name=".framework.view.Main"
             android:exported="true">
-
         </activity>
+
         <activity
             android:name=".framework.view.ProyectoOrganizador"
             android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
+        <activity
+            android:name=".framework.view.PhoneActivity"
+            android:exported="true">
+        </activity>
+        <activity
+            android:name=".framework.view.OTPActivity"
+            android:exported="false" />
         <activity
             android:name=".framework.view.AddNewProjectForm"
             android:exported="true">
+        </activity>
+        <activity
+            android:name=".framework.view.RegisterActivity"
+            android:exported="true">
+        </activity>
+        <activity
+            android:name=".framework.view.CheckIfLogged"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <meta-data
             android:name="preloaded_fonts"

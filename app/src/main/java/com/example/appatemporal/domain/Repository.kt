@@ -3,8 +3,31 @@ package com.example.appatemporal.domain
 import android.content.Context
 import com.example.appatemporal.data.localdatabase.LocalDatabase
 import com.example.appatemporal.data.localdatabase.entities.*
+import com.example.appatemporal.domain.models.UserModel
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.QuerySnapshot
 
 class Repository(context: Context) {
+
+    val firestoreAPI = FirestoreService()
+
+    suspend fun addUser(uid: String, user: UserModel, role: String) {
+        firestoreAPI.addUser(uid, user)
+        firestoreAPI.addUserRole(uid, role)
+    }
+
+    suspend fun verifyUser(uid: String) : Boolean {
+        return firestoreAPI.verifyUser(uid)
+    }
+
+    suspend fun getUser(uid: String) : DocumentSnapshot{
+        return firestoreAPI.getUser(uid)
+    }
+
+    suspend fun getUserRole(uid: String) : DocumentSnapshot {
+        return firestoreAPI.getUserRole(uid)
+    }
+
 
     val actividadDao = LocalDatabase.getInstance(context).actividadDao
     val areaDao = LocalDatabase.getInstance(context).areaDao
