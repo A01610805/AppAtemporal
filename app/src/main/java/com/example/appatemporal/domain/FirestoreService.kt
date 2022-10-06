@@ -141,6 +141,7 @@ class FirestoreService {
                 .whereEqualTo("id_usuario_fk", uid)
                 .get()
                 .await()
+        if (events.isEmpty){return 0}
         return events.count()
     }
 
@@ -152,12 +153,14 @@ class FirestoreService {
                 .whereEqualTo("id_usuario_fk", uid)
                 .get()
                 .await()
+        if (ventas.isEmpty){return Pair(0,0)}
         for (document in ventas){
             var funciones : QuerySnapshot =
                 db.collection("Funcion")
                     .whereEqualTo("id_evento_fk",document.data?.get("id_evento_fk"))
                     .get()
                     .await()
+            if (funciones.isEmpty){return Pair(0,0)}
             for (document in funciones){
                 var boletosAuxVentas : QuerySnapshot =
                     db.collection("Boleto")
@@ -234,7 +237,6 @@ class FirestoreService {
                         .whereEqualTo("id_evento_fk", document.data?.get("id_evento_fk"))
                         .get()
                         .await()
-                if (tiposBoleto.isEmpty){return 0}
                 for (tipoBoleto in tiposBoleto) {
                     for (document in boletos) {
                         if (document.data?.get("id_tipo_boleto_fk") == tipoBoleto.data?.get("id_tipo_boleto_fk")) {
@@ -355,6 +357,7 @@ class FirestoreService {
                 .document(eid)
                 .get()
                 .await()
+        if (!event.exists()){return "Evento no existe"}
         return event.data?.get("nombre").toString()
     }
 
@@ -368,6 +371,7 @@ class FirestoreService {
             .whereEqualTo("id_evento_fk", eid)
             .get()
             .await()
+        if (funciones.isEmpty){return 0}
         Log.d("generalProfitsEvent-Funciones", funciones.count().toString())
         for (element in funciones) {
             boletos = db.collection("Boleto")
@@ -380,12 +384,13 @@ class FirestoreService {
                     .whereEqualTo("id_evento_fk", element.data?.get("id_evento_fk"))
                     .get()
                     .await()
+            if (tiposBoleto.isEmpty){Log.d("ErrorHandlerGPE", "Evento sin tipos de boleto definidos"); return 0}
             Log.d("generalProfitsEvent-tiposBoleto", tiposBoleto.count().toString())
             for (tipoBoleto in tiposBoleto) {
                 for (document in boletos) {
                     if (document.data?.get("id_tipo_boleto_fk") == tipoBoleto.data?.get("id_tipo_boleto_fk") &&
                         tipoBoleto.data?.get("id_evento_fk") == element.data?.get("id_evento_fk")) {
-                        Log.d("generalProfitsEvent-IF", tipoBoleto.data?.get("precio").toString())
+                        //Log.d("generalProfitsEvent-IF", tipoBoleto.data?.get("precio").toString())
                         ganancias += tipoBoleto.data?.get("precio").toString().toInt()
                     }
                     //Log.d("generalProfitsEvent", document.id.toString())
@@ -412,8 +417,7 @@ class FirestoreService {
                 .whereEqualTo("id_funcion_fk", element.id)
                 .get()
                 .await()
-            //if (boletos.isEmpty){diccPM.put("No hay datos boletos", 0); return diccPM}
-
+            // NO poner errorHandler aqui
             for(boleto in boletos){
                 if(boleto.data?.get("id_metodo_pago_fk").toString() !in diccPM){
                     diccPM.put(boleto.data?.get("id_metodo_pago_fk").toString(), 0)
@@ -579,16 +583,15 @@ class FirestoreService {
         var diccAsistencias = mutableMapOf<String, Int?>()
         var diccVentas = mutableMapOf<String, Int?>()
         var diccTotales = mutableMapOf<String, Pair<Int?, Int?>>()
+        var errorHandler = mutableMapOf<String, Pair<Int?, Int?>>()
+        errorHandler.put("No hay datos",Pair(0,0))
 
         var funciones: QuerySnapshot = db.collection("Funcion")
             .whereEqualTo("id_evento_fk", eid)
             .get()
             .await()
         Log.d("getTicketTypeSA-Funciones", funciones.count().toString())
-
-        for (element in funciones){
-            Log.d("CONTENIDO FUNCIONES", element.data?.get("id_funcion_fk").toString())
-        }
+        if (funciones.isEmpty){return errorHandler}
 
         for (element in funciones) {
             boletos = db.collection("Boleto")
@@ -616,7 +619,8 @@ class FirestoreService {
                 .get()
                 .await()
             Log.d("getTicketTypeSA-tiposBoleto", tiposBoleto.count().toString())
-
+            if (tiposBoleto.isEmpty){return errorHandler}
+            //Si truena, es aqui ^
             for ((k, v) in diccVentas) {
                 for (tipoBoleto in tiposBoleto) {
                     if(tipoBoleto.id == k) {
@@ -731,7 +735,7 @@ class FirestoreService {
                 .whereEqualTo("id_funcion_fk", element.id)
                 .get()
                 .await()
-            if (boletos.isEmpty){diccPM.put("No hay datos en Boletos", 0); return diccPM}
+            //if (boletos.isEmpty){diccPM.put("No hay datos en Boletos", 0); return diccPM}
 
             for (boleto in boletos){
                 for (tipoBoleto in tiposboleto){
